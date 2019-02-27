@@ -30,3 +30,67 @@ github_token <- oauth2.0_token(oauth_endpoints("github"), myapp)
 
 # Subset data
 > json2[json2$full_name == "jtleek/datasharing", "created_at"] # Use API
+
+
+# 2. The sqldf package allows for execution of SQL commands on R data frames. 
+# We will use the sqldf package to practice the queries we might send with the 
+# dbSendQuery command in RMySQL.
+# Download the American Community Survey data and load it into an R object 
+# called acs
+
+# Load sqldf package
+library(sqldf)
+
+# Assign url to fileUrl 
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+
+# Download file
+download.file(fileUrl, destfile = "acs.csv")
+
+# Save downloaded date
+dateDownloaded <- date()
+
+# Load data to acs 
+acs <- read.table("acs.csv", header = TRUE, sep = ",")
+
+# Select only the data for the probability weights pwgtp1 with ages less than 50
+dat <- sqldf("select pwgtp1 from acs where AGEP < 50")
+
+
+# 3. Using the same data frame you created in the previous problem, what is 
+# the equivalent function to unique(acs$AGEP)
+
+sqldf("select distinct AGEP from acs")
+
+
+# 4. How many characters are in the 10th, 20th, 30th and 100th lines of HTML 
+# from this page: http://biostat.jhsph.edu/~jleek/contact.html
+# (Hint: the nchar() function in R may be helpful)
+
+# Get data from url
+con = url("http://biostat.jhsph.edu/~jleek/contact.html")
+
+# Read the data
+htmlCode = readLines(con)  
+
+# Close connection
+close(con)
+
+# Get number of characters in each row
+c(nchar(htmlCode[10]), nchar(htmlCode[20]), nchar(htmlCode[30]), 
+        nchar(htmlCode[100]))
+
+
+# 5. Read this data set into R and report the sum of the numbers in the fourth 
+# of the nine columns.
+# https://d396qusza40orc.cloudfront.net/getdata%2Fwksst8110.for
+
+
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fwksst8110.for"
+
+# Get data
+doc <- read.fwf(fileUrl, skip=4, widths=c(12, 7, 4, 9, 4, 9, 4, 9, 4))
+
+# Sum of the 4th column
+sum(doc[, 4])
+
